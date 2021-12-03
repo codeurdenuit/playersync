@@ -11,22 +11,24 @@
     <title>PocMetaj</title>
   </head>
   <body>
-    <div class="pannel">
-      <div id="id"></div>
-      <div class="label">Rooms List</div>
-      <button type="button" id="buttonCreate">New Room</button>
-      <div class="list" id="containerRoom"></div>
+    <div class = "view" id="view1">
+      <div class="pannel">
+        <div id="id"></div>
+        <div class="list" id="containerRoom"></div>
+        <button type="button" id="buttonCreate">New Room</button>
+      </div>
     </div>
-    <div class="pannel">
-      <div class="label">Current Room</div>
-      <button type="button"  id="buttonLeave">Leave Room</button>
-      <div class="list" id="containerClient"></div>
-    </div>
-    <div class="pannel">
-      <div class="label">Current Chat</div>
-      <button type="button"  id="buttonSend">Send Message</button>
-      <input type="text" id="inputMessage" placeholder="Enter a message..." />
-      <div class="list" id="containerChat"></div>
+    <div class = "view" id="view2">
+      <div class="pannel">
+        <div class="label">Players : </div>
+        <div class="list" id="containerClient"></div>
+        <button type="button"  id="buttonLeave">Logout</button>
+      </div>
+      <div class="pannel">
+        <div class="label">Chat :</div>
+        <input type="text" id="inputMessage" placeholder="Enter a message..." />
+        <div class="list" id="containerChat"></div>
+      </div>
     </div>
   </body>
 </html>

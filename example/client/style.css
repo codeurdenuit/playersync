@@ -10,7 +10,6 @@ body {
   padding: 2rem;
   margin: 1rem;
   width: 22rem;
-  border: solid;
   vertical-align: top;
 }
 
@@ -22,7 +21,8 @@ body {
 
 button {
   display: block;
-  padding: 1rem 3rem;
+  padding: 0.2rem 3rem;
+  margin-top: 1rem;
   font-size: 1.5rem;
   width: inherit;
 }
@@ -31,13 +31,18 @@ button {
   padding: 1rem;
   display: block;
   margin-top: 1rem;
-  border: solid;
+  border: solid 1px;
   cursor: pointer;
+}
+
+.user {
+  display: block;
+  margin-top: 1rem;
 }
 
 input {
   display: block;
-  margin-top: 1rem;
+  margin: 1rem 0rem;
   width: inherit;
   font-size: 1.5rem;
 }

@@ -10,8 +10,8 @@ export default class RoomManager {
   async init() {
     const rooms = await this.redis.get('_rooms');
     const roomsAge = await this.redis.get('_roomsage');
-    if(!rooms)  await this.redis.set('_rooms', JSON.stringify({}));
-    if(!roomsAge)  await this.redis.set('_roomsage', JSON.stringify({}));
+    if (!rooms) await this.redis.set('_rooms', JSON.stringify({}));
+    if (!roomsAge) await this.redis.set('_roomsage', JSON.stringify({}));
   }
 
   async getRooms() {
@@ -23,7 +23,7 @@ export default class RoomManager {
 
   async getRoom(roomId) {
     const rooms = await this._getRooms();
-    return rooms[roomId];
+    return rooms[roomId]||[];
   }
 
   async creatRoom(roomId, clientId) {
@@ -95,6 +95,17 @@ export default class RoomManager {
       await this._setRooms(rooms);
       await this._setRoomsAge(roomsAge);
     }
+  }
+
+  async removeRoom(roomId) {
+    const rooms = await this._getRooms();
+    const roomsAge = await this._getRoomsAge();
+    if (!rooms[roomId]) return;
+    delete rooms[roomId];
+    delete roomsAge[roomId];
+    await this._setRooms(rooms);
+    await this._setRoomsAge(roomsAge);
+    return;
   }
 
   async _getRooms() {

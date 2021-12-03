@@ -33,6 +33,12 @@ const playersync = function roomrtcpop(app, duration, redis) {
       const room = await roomManager.leaveRoom(roomId, clientId);
       res.json(room);
     });
+
+    app.post("/api/room/:roomId/close", async (req, res) => {
+      const roomId = req.params.roomId;
+      await roomManager.removeRoom(roomId);
+      res.json({});
+    });
   
     app.post("/api/room", async (req, res) => {
       const roomId = req.body.roomId || `room${Math.floor(Math.random() * 100000)}`;
@@ -66,6 +72,12 @@ const playersync = function roomrtcpop(app, duration, redis) {
       const roomId = req.params.roomId;
       const room = roomManager.leaveRoom(roomId, clientId);
       res.json(room);
+    });
+
+    app.post("/api/room/:roomId/close", (req, res) => {
+      const roomId = req.params.roomId;
+      roomManager.removeRoom(roomId);
+      res.json({});
     });
   
     app.post("/api/room", (req, res) => {

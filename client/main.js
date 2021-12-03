@@ -2,68 +2,93 @@ import Peer from 'peerjs';
 
 class PlayerSyncClient {
 
-  constructor(host, ) {
+  constructor(host) {
     this.peer = null;
     this.id = null;
     this.conns = [];
     this.host = host||'';
     this.roomId = null;
-    this.initialize();
+    this.username = '';
+    this.baseId = 'f152ezr454rez56rdghdfg6465ezr6ez4_';
+    this.preid = `${this.baseId}${Math.random().toString(36).substr(2, 3)}-`;
   }
 
-  initialize() {
-    this.peer = new Peer();
+  connect(username) {
+    return new Promise((resolve, reject) => {
+      if(username) {
+        this.username = username.replace(/[^a-zA-Z ]|\s/g, '');
+      } else {
+        this.username = Math.random().toString(36).substr(2, 9);
+      }
 
-      this.peer.on('open', id => {
-        this.id = id;
-      });
-    
-      this.peer.on('connection', c => {
-        this._initConn(c);
-        this.refreshRoom();
-      });
-    
-      this.peer.on('error', async err => {
-        if(err.type === 'peer-unavailable') {
-          const clientId = err.message.split('peer ')[1];
-          const room = await this.leaveRoom(this.roomId, clientId);
-          this._onRoomUpdated(room);
-        }
-        console.log('error : ' + err);
-      });
+      this.peer = new Peer(`${this.preid}${this.username}`);
 
-      window.addEventListener('beforeunload', () => {
-        if(this.roomId) {
-          const xhttp = new XMLHttpRequest();
-          xhttp.open("POST", `${this.host}/api/room/${this.roomId}/leave`, true);
-          xhttp.setRequestHeader('Content-type', 'application/json');
-          xhttp.send(JSON.stringify({clientId:this.id}));
-        }
-      });
+        this.peer.on('open', id => {
+          this.id = id.split('_')[1];
+          resolve(this.id);
+        });
+      
+        this.peer.on('connection', c => {
+          this._initConn(c);
+          this.refreshRoom();
+        });
+      
+        this.peer.on('error', async err => {
+          if(err.type === 'peer-unavailable') {
+            const clientId = err.message.split('peer ')[1];
+            await this.leaveRoom(this.roomId, clientId);
+            if(this._onJoinFail)
+              this._onJoinFail();
+            this._onJoinFail = null;
+          }
+          console.log('error : ' + err);
+        });
+
+        window.addEventListener('beforeunload', () => {
+          if(this.roomId) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.open("POST", `${this.host}/api/room/${this.roomId}/leave`, true);
+            xhttp.setRequestHeader('Content-type', 'application/json');
+            xhttp.send(JSON.stringify({clientId:this.id}));
+          }
+        });
+    });
   }
 
   async joinRoom(roomId) {
     await this.leaveRoom();
     const room = await this.getRoom(roomId);
-    for(let i=0; i<room.length; i++) {
-      const clientId = room[i];
-      if(clientId && clientId != this.id) {
-        this.joinClient(clientId);
+    if(!room.length) return null;
+    try {
+      for(let i=0; i<room.length; i++) {
+        const clientId = room[i];
+        if(clientId && clientId != this.id) {
+          await this.joinClient(clientId);
+        }
       }
+    } catch(e) {
+      return null;
     }
     this.roomId = roomId;
-    this.refreshRoom();
     await this._joinRoom(roomId, this.id);
+
+    const currentRoom = this.conns.map(c=>c.peer.split('_')[1]);
+    currentRoom.push(this.id);
+    return currentRoom;
   }
 
-  joinClient(userId) {
-    if(userId === this.id) return;
-    const conn = this.peer.connect(userId, { reliable: true });
-    conn.on('open', () => {
-      var command = this._getUrlParam("command");
-      if (command) conn.send(command);
-      this._initConn(conn);
-      this.refreshRoom();
+  joinClient(clientId) {
+    return new Promise((resolve, reject) => {
+      if(clientId === this.id) return;
+      const fullClientId = `${this.baseId}${clientId}`;
+      const conn = this.peer.connect(fullClientId, { reliable: true });
+      this._onJoinFail = reject;
+      conn.on('open', () => {
+        resolve();
+        var command = this._getUrlParam("command");
+        if (command) conn.send(command);
+        this._initConn(conn);
+      });
     });
   }
 
@@ -79,13 +104,13 @@ class PlayerSyncClient {
   _initConn(conn) {
     this.conns.push(conn);
     conn.on('data', data => {
-      this._onData(data, conn.peer);
+      this._onData(data, conn.peer.split('_')[1]);
     });
     conn.on('close', async () => {
       if(!this.roomId) return;
       const index = this.conns.indexOf(conn);
       this.conns.splice(index, 1);
-      const clientId = conn.peer;
+      const clientId = conn.peer.split('_')[1];
       await this._leaveRoom(this.roomId, clientId);
       this.refreshRoom();
     });
@@ -114,7 +139,7 @@ class PlayerSyncClient {
 
   refreshRoom() {
     if(this.roomId) {
-      const room = this.conns.map(c=>c.peer);
+      const room = this.conns.map(c=>c.peer.split('_')[1]);
       room.push(this.id);
       this._onRoomUpdated(room);
     } else {
@@ -157,6 +182,10 @@ class PlayerSyncClient {
     return rooms[this.roomId];
   }
 
+  async closeRoom(roomId) {
+    return this.requestPost(`${this.host}/api/room/${roomId}/close`);
+  }
+
   async requestPost(url, body) {
     try {
       const fetchResponse = await fetch(url, {
@@ -166,7 +195,7 @@ class PlayerSyncClient {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body)
+        body: body ? JSON.stringify(body): null
       });
       return fetchResponse.json();
     } catch(e) {

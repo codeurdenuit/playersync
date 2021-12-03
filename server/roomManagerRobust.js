@@ -12,7 +12,7 @@ export default class RoomManager {
   }
 
   getRoom(roomId) {
-    return this.rooms[roomId];
+    return this.rooms[roomId]||[];
   }
 
   creatRoom(roomId, clientId) {
@@ -69,5 +69,12 @@ export default class RoomManager {
         delete this.roomsDate[roomId];
       }
     }
+  }
+
+  removeRoom(roomId) {
+    if (!this.rooms[roomId]) return;
+    delete this.rooms[roomId];
+    delete this.roomsDate[roomId];
+    return;
   }
 }

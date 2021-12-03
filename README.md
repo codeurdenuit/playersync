@@ -30,7 +30,6 @@ It is used by PlayerSyncClient.
 ```js
 import { playersync } from 'playersync';
 const app = express();
-
 /** your server code **/
 playersync(app); 
 /** your server code **/
@@ -47,6 +46,9 @@ import { PlayerSyncClient } from 'playersync';
 const host = 'https://yourserver';
 const psc = new PlayerSyncClient(host);
 
+//Connect with a nickname
+await psc.connect(yourUsername);
+
 //See groups
 const rooms = await psc.getRooms();
 
@@ -54,7 +56,7 @@ const rooms = await psc.getRooms();
 const room = await psc.createRoom();
 
 //Join a group of player
-await psc.joinRoom(roomId);
+const room = await psc.joinRoom(roomId);
 
 //Send data to other players
 psc.sendData(yourData);
@@ -91,10 +93,17 @@ The room only allows the newcomer to know the playerIds of a group of connected 
 ```js
 const psc = new PlayerSyncClient(host);
 ```
-**- Params :** String (host) If the API server is on another host
+**- Params :** [Optional] String : Add a host if the API server is on another host.
 Instance which will manage connections between players.
 Instance  also manage send / receive data between connected players.
 
+### Connect()
+```js
+const playerId = await psc.connect(yourUsername);
+```
+**- Params :** [Optional] String :  Specify your username(no special characters and no space)
+**- Return :** String : your playerId
+Generate a playerId. Necessary to be able to use PlayerSyncClient
 
 ### GetRooms()
 ```js
@@ -120,10 +129,11 @@ A room without PlayerId is automatically deleted.
 ```js
 const  room = await  psc.joinRoom(roomId);
 ```
-**- Params :** String roomId
+**- Params :** String roomId : Room that you want to join
 **- Return :** Array [PlayerId....]
 Allows you to join an existing room.
 Your browser is automatically connected with players of this room.
+If the attempt fails, the function returns nothing.
 
 
 ### SendData()
@@ -142,6 +152,16 @@ await psc.leaveRoom();
 **- Params :** -
 **- Return :** -
 Log out of all players you are logged in with.
+
+### CloseRoom()
+```js
+await psc.closeRoom(roomId);
+```
+**- Params :** -
+**- Return :** -
+Make a room inaccessible.
+But player already connected can continue to communicate.
+Useful to limit the number of players in a room or avoid the arrival of new players after starting game.
 
 
 ### OnData()

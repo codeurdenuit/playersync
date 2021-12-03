@@ -17,7 +17,7 @@ export default class RoomManager {
 
   async getRoom(roomId) {
     const rooms = await this._getRooms();
-    return rooms[roomId];
+    return rooms[roomId]||[];
   }
 
   async creatRoom(roomId, clientId) {
@@ -62,6 +62,14 @@ export default class RoomManager {
         }
       }
     }
+  }
+
+  async removeRoom(roomId) {
+    const rooms = await this._getRooms();
+    if (!rooms[roomId]) return;
+    delete rooms[roomId];
+    await this._setRooms(rooms);
+    return;
   }
 
   async _getRooms() {

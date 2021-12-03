@@ -3,26 +3,43 @@ import {PlayerSyncClient} from './../../client/main';
 const host = 'http://localhost:3030';
 
 window.addEventListener('load', async () => {
-  const input = document.getElementById("inputMessage");
-  const buttonCreate = document.getElementById("buttonCreate");
-  const buttonSend = document.getElementById("buttonSend");
-  const buttonLeave = document.getElementById("buttonLeave");
+  const input = document.getElementById('inputMessage');
+  const buttonCreate = document.getElementById('buttonCreate');
+  const buttonLeave = document.getElementById('buttonLeave');
+  const view1 = document.getElementById('view1');
+  const view2 = document.getElementById('view2');
+  view2.style.display = 'none';
+  const usernames = ['Shunio', 'Xante', 'Sirtus', 'FireFall', 'Azra', 'Nederis', 'Frog', 'Cerus', 'Xadal', 'Shino', 'Lakepo', 'Tino'];
+  const yourUsername = usernames[Math.floor(Math.random()*usernames.length)];
 
   const psc = new PlayerSyncClient(host);
 
-  psc.onData((data)=>{
-    drawMessage(data.text);
+  const yourPlayerId = await psc.connect(yourUsername);
+
+  psc.onData((data, clientId)=>{
+    drawMessage(data.text, clientId);
   });
 
   psc.onRoomUpdated((room)=> {
+    view1.style.display = 'none';
+    view2.style.display = 'block';
     drawRoom(room);
   });
 
   async function joinRoom(roomId) {
-    await psc.joinRoom(roomId);
+    const room = await psc.joinRoom(roomId);
+    if(!room) {
+      refreshRooms();
+    }else {
+      view1.style.display = 'none';
+      view2.style.display = 'block';
+      drawRoom(room);
+    }
   }
 
   async function refreshRooms() {
+    view1.style.display = 'block';
+    view2.style.display = 'none';
     const rooms = await psc.getRooms();
     drawRooms(rooms);
   }
@@ -32,11 +49,13 @@ window.addEventListener('load', async () => {
     drawRoom(room);
     refreshRooms();
     drawChatContainer();
+    view1.style.display = 'none';
+    view2.style.display = 'block';
   }
 
   function sendMessage() {
     psc.sendData({text:input.value});
-    drawMessage(input.value);
+    drawMessage(input.value, psc.id);
     input.value = '';
   }
 
@@ -44,45 +63,54 @@ window.addEventListener('load', async () => {
     await psc.leaveRoom();
     drawChatContainer();
     await refreshRooms();
+    view1.style.display = 'block';
+    view2.style.display = 'none';
   }
 
   buttonCreate.addEventListener('click', createRoom.bind(this));
 
-  buttonSend.addEventListener('click', sendMessage.bind(this));
+
+  input.addEventListener('keyup', event => {
+    if (event.keyCode === 13) {
+      sendMessage();
+      event.preventDefault();
+    }
+  });
 
   buttonLeave.addEventListener('click', leave.bind(this));
 
   ///////////////////////////////DRAW DOM///////////////////////////////////////
 
-  function drawMessage(mgs) {
-    const container = document.getElementById("containerChat");
+  function drawMessage(mgs, clientId) {
+    const container = document.getElementById('containerChat');
     const node = document.createElement('div');
-    node.textContent = mgs;
+    node.textContent =  `${clientId.split('-')[1]} : ${mgs}`;
     container.appendChild(node);
   }
 
   async function drawRoom(room) {
-    const clientList = document.getElementById("containerClient");
+    const clientList = document.getElementById('containerClient');
     while (clientList.firstChild) {
       clientList.removeChild(clientList.firstChild);
     }
     for(let i =0; i<room.length; i++) {
-      createDiv('item', room[i], null, clientList);
+      const player = room[i].split('-')[1] + (room[i] === yourPlayerId ? ' (you)': '');
+      createDiv('user', player, null, clientList);
     }
   }
 
   function drawRooms(rooms) {
-    const roomList = document.getElementById("containerRoom");
+    const roomList = document.getElementById('containerRoom');
     while (roomList.firstChild) {
       roomList.removeChild(roomList.firstChild);
     }
     for(let key in rooms) {
-      createDiv('item', key + ' users : ' + rooms[key].length, ()=>{joinRoom(key)}, roomList);
+      createDiv('item', key + '(' + rooms[key].length+')', ()=>{joinRoom(key)}, roomList);
     }
   }
 
   function drawChatContainer() {
-    const chatList = document.getElementById("containerChat");
+    const chatList = document.getElementById('containerChat');
     while (chatList.firstChild) {
       chatList.removeChild(chatList.firstChild);
     }
