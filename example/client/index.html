@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      var parcelRequire;//fix peerjs with vite
+    </script>
+    <script type="module" src="/main.js"></script>
+    <title>PocMetaj</title>
+  </head>
+  <body>
+    <div class="pannel">
+      <div id="id"></div>
+      <div class="label">Rooms List</div>
+      <button type="button" id="buttonCreate">New Room</button>
+      <div class="list" id="containerRoom"></div>
+    </div>
+    <div class="pannel">
+      <div class="label">Current Room</div>
+      <button type="button"  id="buttonLeave">Leave Room</button>
+      <div class="list" id="containerClient"></div>
+    </div>
+    <div class="pannel">
+      <div class="label">Current Chat</div>
+      <button type="button"  id="buttonSend">Send Message</button>
+      <input type="text" id="inputMessage" placeholder="Enter a message..." />
+      <div class="list" id="containerChat"></div>
+    </div>
+  </body>
+</html>

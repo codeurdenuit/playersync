@@ -1,0 +1,43 @@
+body {
+  margin:0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.pannel {
+  display: inline-block;
+  position: relative;
+  padding: 2rem;
+  margin: 1rem;
+  width: 22rem;
+  border: solid;
+  vertical-align: top;
+}
+
+.label {
+  font-size: 2rem;
+  font-family: sans-serif;
+  margin-bottom: 1rem;
+}
+
+button {
+  display: block;
+  padding: 1rem 3rem;
+  font-size: 1.5rem;
+  width: inherit;
+}
+
+.item {
+  padding: 1rem;
+  display: block;
+  margin-top: 1rem;
+  border: solid;
+  cursor: pointer;
+}
+
+input {
+  display: block;
+  margin-top: 1rem;
+  width: inherit;
+  font-size: 1.5rem;
+}
