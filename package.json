@@ -1,13 +1,9 @@
 {
   "name": "playersync",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "PlayerSync makes it easy to create multiplayer games",
   "type": "module",
-  "main": "main.js",
-  "exports": {
-    "playersync": "server/main.js",
-    "PlayerSyncClient": "client/main.js"
-  },
+  "main": "server/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

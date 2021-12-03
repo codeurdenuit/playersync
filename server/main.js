@@ -89,5 +89,4 @@ const playersync = function roomrtcpop(app, duration, redis) {
   }
 }
 
-
-export {playersync}
+export default playersync;

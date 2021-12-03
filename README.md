@@ -28,7 +28,7 @@ This API allows to establish the connection between players.
 It is used by PlayerSyncClient.
 
 ```js
-import { playersync } from 'playersync';
+import playersync from 'playersync';
 const app = express();
 /** your server code **/
 playersync(app); 
@@ -41,7 +41,7 @@ playersync(app);
 Use PlayerSyncClient to connect players
 
 ```js
-import { PlayerSyncClient } from 'playersync';
+import { PlayerSyncClient } from 'playersync/client';
 
 const host = 'https://yourserver';
 const psc = new PlayerSyncClient(host);
