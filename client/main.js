@@ -167,11 +167,11 @@ class PlayerSyncClient {
     return this.requestGet(`${this.host}/api/room`);
   }
 
-  async createRoom() {
+  async createRoom(roomId) {
     if(!this.id) return;
     await this.leaveRoom();
     const clientId = this.id;
-    const rooms = await this.requestPost(`${this.host}/api/room/`, {clientId})
+    const rooms = await this.requestPost(`${this.host}/api/room/`, {clientId, roomId})
     for(let roomId in rooms) {
       const room = rooms[roomId];
       if(room.includes(clientId)) {
