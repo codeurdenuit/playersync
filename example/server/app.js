@@ -3,7 +3,7 @@ const app = express();
 import http from 'http';
 import path from 'path';
 import cors from 'cors';
-import { playersync } from './../..//server/main.js';
+import  playersync  from './../../server/main.js';
 
 const PORT = process.env.PORT || 3030;
 

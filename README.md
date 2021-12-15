@@ -1,11 +1,6 @@
 # PlayerSync
 
-This allows browsers to be connected to each other with Webrtc.
-The procedure takes place without using a websocket.
-The peering takes place via an API.
-A player can create a room.
-Other players can join this room.
-As soon as a player joins a room, he is automatically connected with the other players of this room.
+This allows browsers to be connected to each other with Webrtc and doesn't require any websocket to work. The peering is implemented with an API. A player can create a room that other players can join. As soon as a player joins a room, he is automatically connected with the other players of this room.
 
 
 ## Why 
@@ -41,7 +36,7 @@ playersync(app);
 Use PlayerSyncClient to connect players
 
 ```js
-import { PlayerSyncClient } from 'playersync/client';
+import PlayerSyncClient  from 'playersync/client';
 
 const host = 'https://yourserver';
 const psc = new PlayerSyncClient(host);

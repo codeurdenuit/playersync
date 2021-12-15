@@ -1,1 +1,1 @@
-import {PlayerSyncClient} from './client/main';
+export { default } from './client/main';

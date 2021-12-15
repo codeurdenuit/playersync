@@ -222,5 +222,4 @@ class PlayerSyncClient {
 
 } 
 
-
-export {PlayerSyncClient} 
+export default PlayerSyncClient;

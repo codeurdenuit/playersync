@@ -1,5 +1,5 @@
 import './style.css';
-import {PlayerSyncClient} from './../../client/main';
+import PlayerSyncClient from './../../client';
 const host = 'http://localhost:3030';
 
 window.addEventListener('load', async () => {
