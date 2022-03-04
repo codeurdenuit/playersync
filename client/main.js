@@ -193,7 +193,9 @@ class PlayerSyncClient {
         mode: 'cors',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'pragma': 'no-cache',
+          'cache-control': 'no-cache'
         },
         body: body ? JSON.stringify(body): null
       });
@@ -211,6 +213,8 @@ class PlayerSyncClient {
         mode: 'cors',
         headers: {
           'Accept': 'application/json',
+          'pragma': 'no-cache',
+          'cache-control': 'no-cache'
         }
       });
       return fetchResponse.json();
