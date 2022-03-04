@@ -17,13 +17,17 @@ export default class RoomManager {
 
   async getRoom(roomId) {
     const rooms = await this._getRooms();
-    return rooms[roomId]||[];
+    return rooms[roomId] || [];
   }
 
   async creatRoom(roomId, clientId) {
     const rooms = await this._getRooms();
     this.removeClientId(clientId, rooms);
-    rooms[roomId] = [clientId];
+    if (rooms[roomId]) {
+      rooms[roomId].push(clientId);
+    } else {
+      rooms[roomId] = [clientId];
+    }
     await this._setRooms(rooms);
     return rooms;
   }

@@ -23,14 +23,18 @@ export default class RoomManager {
 
   async getRoom(roomId) {
     const rooms = await this._getRooms();
-    return rooms[roomId]||[];
+    return rooms[roomId] || [];
   }
 
   async creatRoom(roomId, clientId) {
     const rooms = await this._getRooms();
     const roomsAge = await this._getRoomsAge();
     this.removeClientId(clientId, rooms, roomsAge);
-    rooms[roomId] = [clientId];
+    if (rooms[roomId]) {
+      rooms[roomId].push(clientId);
+    } else {
+      rooms[roomId] = [clientId];
+    }
     roomsAge[roomId] = new Date();
     await this._setRooms(rooms);
     await this._setRoomsAge(roomsAge);

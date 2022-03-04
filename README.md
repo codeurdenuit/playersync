@@ -113,7 +113,7 @@ Returns an object containing the roomId of existing rooms.
 ```js
 const  room = await  psc.createRoom();
 ```
-**- Params :** -
+**- Params :** String roomId
 **- Return :** Array [yourPlayerId]
 Create a room.
 Your PlayerId from your browser is automatically added to this room. The other browsers will be able to join this room and connect to you.

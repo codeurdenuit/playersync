@@ -12,12 +12,16 @@ export default class RoomManager {
   }
 
   getRoom(roomId) {
-    return this.rooms[roomId]||[];
+    return this.rooms[roomId] || [];
   }
 
   creatRoom(roomId, clientId) {
     this.removeClientId(clientId);
-    this.rooms[roomId] = [clientId];
+    if (this.rooms[roomId]) {
+      this.rooms[roomId].push(clientId);
+    } else {
+      this.rooms[roomId] = [clientId];
+    }
     this.roomsDate[roomId] = new Date();
     return this.rooms;
   }
