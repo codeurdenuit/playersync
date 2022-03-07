@@ -6,7 +6,7 @@ class PlayerSyncClient {
     this.peer = null;
     this.id = null;
     this.conns = [];
-    this.host = host||'';
+    this.host = host || '';
     this.roomId = null;
     this.username = '';
     this.baseId = 'f152ezr454rez56rdghdfg6465ezr6ez4_';
@@ -15,7 +15,7 @@ class PlayerSyncClient {
 
   connect(username) {
     return new Promise((resolve, reject) => {
-      if(username) {
+      if (username) {
         this.username = username.replace(/[^a-zA-Z ]|\s/g, '');
       } else {
         this.username = Math.random().toString(36).substr(2, 9);
@@ -23,63 +23,63 @@ class PlayerSyncClient {
 
       this.peer = new Peer(`${this.preid}${this.username}`);
 
-        this.peer.on('open', id => {
-          this.id = id.split('_')[1];
-          resolve(this.id);
-        });
-      
-        this.peer.on('connection', c => {
-          this._initConn(c);
-          this.refreshRoom();
-        });
-      
-        this.peer.on('error', async err => {
-          if(err.type === 'peer-unavailable') {
-            const clientId = err.message.split('peer ')[1];
-            await this.leaveRoom(this.roomId, clientId);
-            if(this._onJoinFail)
-              this._onJoinFail();
-            this._onJoinFail = null;
-          }
-          console.log('error : ' + err);
-        });
+      this.peer.on('open', id => {
+        this.id = id.split('_')[1];
+        resolve(this.id);
+      });
 
-        window.addEventListener('beforeunload', () => {
-          if(this.roomId) {
-            const xhttp = new XMLHttpRequest();
-            xhttp.open("POST", `${this.host}/api/room/${this.roomId}/leave`, true);
-            xhttp.setRequestHeader('Content-type', 'application/json');
-            xhttp.send(JSON.stringify({clientId:this.id}));
-          }
-        });
+      this.peer.on('connection', c => {
+        this._initConn(c);
+        this.refreshRoom();
+      });
+
+      this.peer.on('error', async err => {
+        if (err.type === 'peer-unavailable') {
+          const clientId = err.message.split('peer ')[1];
+          await this.leaveRoom(this.roomId, clientId);
+          if (this._onJoinFail)
+            this._onJoinFail();
+          this._onJoinFail = null;
+        }
+        console.log('error : ' + err);
+      });
+
+      window.addEventListener('beforeunload', () => {
+        if (this.roomId) {
+          const xhttp = new XMLHttpRequest();
+          xhttp.open("POST", `${this.host}/api/room/${this.roomId}/leave`, true);
+          xhttp.setRequestHeader('Content-type', 'application/json');
+          xhttp.send(JSON.stringify({ clientId: this.id }));
+        }
+      });
     });
   }
 
   async joinRoom(roomId) {
     await this.leaveRoom();
     const room = await this.getRoom(roomId);
-    if(!room.length) return null;
-    try {
-      for(let i=0; i<room.length; i++) {
-        const clientId = room[i];
-        if(clientId && clientId != this.id) {
+    if (!room.length) return null;
+    for (let i = 0; i < room.length; i++) {
+      const clientId = room[i];
+      try {
+        if (clientId && clientId != this.id) {
           await this.joinClient(clientId);
         }
+      } catch (e) {
+        await this._leaveRoom(roomId, clientId);
       }
-    } catch(e) {
-      return null;
     }
     this.roomId = roomId;
     await this._joinRoom(roomId, this.id);
 
-    const currentRoom = this.conns.map(c=>c.peer.split('_')[1]);
+    const currentRoom = this.conns.map(c => c.peer.split('_')[1]);
     currentRoom.push(this.id);
     return currentRoom;
   }
 
   joinClient(clientId) {
     return new Promise((resolve, reject) => {
-      if(clientId === this.id) return;
+      if (clientId === this.id) return;
       const fullClientId = `${this.baseId}${clientId}`;
       const conn = this.peer.connect(fullClientId, { reliable: true });
       this._onJoinFail = reject;
@@ -93,7 +93,7 @@ class PlayerSyncClient {
   }
 
   async leaveRoom() {
-    if(!this.roomId) return
+    if (!this.roomId) return
     await this._leaveRoom(this.roomId, this.id);
     this.roomId = null;
     this.conns.forEach(c => c.close());
@@ -107,7 +107,7 @@ class PlayerSyncClient {
       this._onData(data, conn.peer.split('_')[1]);
     });
     conn.on('close', async () => {
-      if(!this.roomId) return;
+      if (!this.roomId) return;
       const index = this.conns.indexOf(conn);
       this.conns.splice(index, 1);
       const clientId = conn.peer.split('_')[1];
@@ -128,7 +128,7 @@ class PlayerSyncClient {
   };
 
   sendData(value) {
-    for(let i = 0; i<this.conns.length; i++ ) {
+    for (let i = 0; i < this.conns.length; i++) {
       this.conns[i].send(value);
     }
   }
@@ -138,8 +138,8 @@ class PlayerSyncClient {
   }
 
   refreshRoom() {
-    if(this.roomId) {
-      const room = this.conns.map(c=>c.peer.split('_')[1]);
+    if (this.roomId) {
+      const room = this.conns.map(c => c.peer.split('_')[1]);
       room.push(this.id);
       this._onRoomUpdated(room);
     } else {
@@ -156,11 +156,11 @@ class PlayerSyncClient {
   }
 
   async _joinRoom(roomId, clientId) {
-    return this.requestPost(`${this.host}/api/room/${roomId}/join`, {clientId});
+    return this.requestPost(`${this.host}/api/room/${roomId}/join`, { clientId });
   }
 
   async _leaveRoom(roomId, clientId) {
-    return this.requestPost(`${this.host}/api/room/${roomId}/leave`, {clientId});
+    return this.requestPost(`${this.host}/api/room/${roomId}/leave`, { clientId });
   }
 
   async getRooms() {
@@ -168,13 +168,13 @@ class PlayerSyncClient {
   }
 
   async createRoom(roomId) {
-    if(!this.id) return;
+    if (!this.id) return;
     await this.leaveRoom();
     const clientId = this.id;
-    const rooms = await this.requestPost(`${this.host}/api/room/`, {clientId, roomId})
-    for(let roomId in rooms) {
+    const rooms = await this.requestPost(`${this.host}/api/room/`, { clientId, roomId })
+    for (let roomId in rooms) {
       const room = rooms[roomId];
-      if(room.includes(clientId)) {
+      if (room.includes(clientId)) {
         this.roomId = roomId;
         break;
       }
@@ -197,10 +197,10 @@ class PlayerSyncClient {
           'pragma': 'no-cache',
           'cache-control': 'no-cache'
         },
-        body: body ? JSON.stringify(body): null
+        body: body ? JSON.stringify(body) : null
       });
       return fetchResponse.json();
-    } catch(e) {
+    } catch (e) {
       console.log(e);
       return null;
     }
@@ -218,12 +218,12 @@ class PlayerSyncClient {
         }
       });
       return fetchResponse.json();
-    } catch(e) {
+    } catch (e) {
       console.log(e);
       return null;
     }
   }
 
-} 
+}
 
 export default PlayerSyncClient;
